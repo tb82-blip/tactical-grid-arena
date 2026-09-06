@@ -57,12 +57,13 @@ export function movementRange(s: GameState, u: Unit): Set<string> {
     const cur = queue.shift()!;
     if (cur.cost >= cls.move) continue;
     const from = tileAt(s, cur.x, cur.y)!;
-    for (const [dx, dy] of [
+    const dirs: Array<[number, number]> = [
       [1, 0],
       [-1, 0],
       [0, 1],
       [0, -1],
-    ]) {
+    ];
+    for (const [dx, dy] of dirs) {
       const nx = cur.x + dx;
       const ny = cur.y + dy;
       const key = `${nx},${ny}`;
