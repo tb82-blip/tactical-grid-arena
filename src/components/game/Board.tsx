@@ -60,11 +60,11 @@ export function Board() {
             >
               <boxGeometry args={[0.98, h, 0.98]} />
               <meshBasicMaterial
-                color={COLORS[t.type]}
+                color={COLORS[t.type] ?? "#1d2a33"}
                 transparent
                 opacity={t.type === "water" ? 0.35 : 0.75}
               />
-              <Edges threshold={15} color={WIRE[t.type]} />
+              <Edges threshold={15} color={WIRE[t.type] ?? "#4f7f8f"} />
             </mesh>
 
             {(inMove || inAttack || hovered) && (
