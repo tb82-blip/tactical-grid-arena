@@ -38,7 +38,7 @@ export interface ImportedModel {
   /** object URL of the .obj file */
   url: string;
   /** object URL of an optional pixel texture */
-  textureUrl?: string;
+  textureUrl?: string | undefined;
 }
 
 export type Mode = "select" | "move" | "attack";
