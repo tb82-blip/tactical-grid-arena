@@ -29,7 +29,7 @@ export interface Unit {
   y: number;
   hp: number;
   /** id of an imported .obj model, if any */
-  modelId?: string;
+  modelId?: string | undefined;
 }
 
 export interface ImportedModel {
