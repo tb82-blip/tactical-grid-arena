@@ -1,8 +1,9 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { XR, XROrigin, createXRStore } from "@react-three/xr";
+import { XR, createXRStore } from "@react-three/xr";
 import { Scene } from "./Scene";
 import { HUD } from "./HUD";
+import { OneHandControls } from "./OneHandControls";
 
 const xrStore = createXRStore();
 
@@ -13,7 +14,7 @@ export function GameCanvas() {
         <color attach="background" args={["#080d11"]} />
         <fog attach="fog" args={["#080d11", 30, 70]} />
         <XR store={xrStore}>
-          <XROrigin position={[0, 0, 9]} />
+          <OneHandControls />
           <Scene />
         </XR>
         <OrbitControls makeDefault target={[0, 0, 0]} maxPolarAngle={Math.PI / 2.1} />
@@ -22,3 +23,4 @@ export function GameCanvas() {
     </div>
   );
 }
+
