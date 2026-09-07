@@ -314,7 +314,7 @@ export function OneHandControls() {
 
   return (
     <>
-      <XROrigin ref={origin} position={[0, 0, 9]} />
+      <XROrigin ref={origin} position={[0, 0, 9]}>{session && <ControlsCard />}</XROrigin>
       {session && panelOpen && <ControlPanel origin={origin} />}
     </>
   );
