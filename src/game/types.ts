@@ -18,6 +18,10 @@ export interface UnitClass {
   hp: number;
   /** can traverse water tiles */
   aquatic: boolean;
+  /** neon accent color (hex) used for glow, particles, and silhouette tint */
+  glowColor: string;
+  /** short flavor line shown in the HUD */
+  blurb: string;
 }
 
 export interface Unit {
