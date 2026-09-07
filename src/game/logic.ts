@@ -1,8 +1,9 @@
 import { UNIT_CLASSES } from "./classes";
 import type { GameState, Tile, Unit } from "./types";
+import { TABLETOP_SCALE } from "./palette";
 
-export const TILE_SIZE = 1;
-export const STEP = 0.25; // world units per height step
+export const TILE_SIZE = TABLETOP_SCALE.tileMeters;
+export const STEP = TABLETOP_SCALE.elevationStepMeters;
 
 export const idx = (w: number, x: number, y: number) => y * w + x;
 
@@ -38,7 +39,8 @@ export function generateMap(width: number, height: number): Tile[] {
 function passable(s: GameState, u: Unit, from: Tile, x: number, y: number): boolean {
   const t = tileAt(s, x, y);
   if (!t || t.type === "void") return false;
-  const cls = UNIT_CLASSES[u.cls]!;
+  const cls = UNIT_CLASSES[u.cls];
+  if (!cls) return false;
   if (t.type === "water" && !cls.aquatic) return false;
   if (Math.abs(t.height - from.height) > cls.jump) return false;
   const occupant = unitAt(s, x, y);
@@ -50,13 +52,16 @@ function passable(s: GameState, u: Unit, from: Tile, x: number, y: number): bool
 export function movementRange(s: GameState, u: Unit): Set<string> {
   const start = tileAt(s, u.x, u.y);
   if (!start) return new Set();
-  const cls = UNIT_CLASSES[u.cls]!;
+  const cls = UNIT_CLASSES[u.cls];
+  if (!cls) return new Set();
   const seen = new Map<string, number>([[`${u.x},${u.y}`, 0]]);
   const queue: Array<{ x: number; y: number; cost: number }> = [{ x: u.x, y: u.y, cost: 0 }];
   while (queue.length) {
-    const cur = queue.shift()!;
+    const cur = queue.shift();
+    if (!cur) break;
     if (cur.cost >= cls.move) continue;
-    const from = tileAt(s, cur.x, cur.y)!;
+    const from = tileAt(s, cur.x, cur.y);
+    if (!from) continue;
     const dirs: Array<[number, number]> = [
       [1, 0],
       [-1, 0],
@@ -68,7 +73,8 @@ export function movementRange(s: GameState, u: Unit): Set<string> {
       const ny = cur.y + dy;
       const key = `${nx},${ny}`;
       const next = cur.cost + 1;
-      if (seen.has(key) && seen.get(key)! <= next) continue;
+      const previous = seen.get(key);
+      if (previous !== undefined && previous <= next) continue;
       if (!passable(s, u, from, nx, ny)) continue;
       seen.set(key, next);
       queue.push({ x: nx, y: ny, cost: next });
@@ -86,7 +92,8 @@ export function movementRange(s: GameState, u: Unit): Set<string> {
 
 /** Diamond attack range (min..max Manhattan distance). */
 export function attackRange(s: GameState, u: Unit): Set<string> {
-  const cls = UNIT_CLASSES[u.cls]!;
+  const cls = UNIT_CLASSES[u.cls];
+  if (!cls) return new Set();
   const out = new Set<string>();
   for (let dy = -cls.attackMax; dy <= cls.attackMax; dy++) {
     for (let dx = -cls.attackMax; dx <= cls.attackMax; dx++) {
@@ -106,6 +113,6 @@ export function damage(attacker: Unit, target: Unit, s: GameState): number {
   const a = tileAt(s, attacker.x, attacker.y);
   const t = tileAt(s, target.x, target.y);
   const highGround = (a?.height ?? 0) > (t?.height ?? 0) ? 3 : 0;
-  const base = UNIT_CLASSES[attacker.cls]!.attackMax > 1 ? 7 : 10;
+  const base = (UNIT_CLASSES[attacker.cls]?.attackMax ?? 1) > 1 ? 7 : 10;
   return base + highGround;
 }

@@ -7,7 +7,8 @@ const W = 12;
 const H = 12;
 
 function makeUnit(id: string, name: string, team: Unit["team"], cls: string, x: number, y: number): Unit {
-  return { id, name, team, cls, x, y, hp: UNIT_CLASSES[cls]!.hp };
+  const unitClass = UNIT_CLASSES[cls];
+  return { id, name, team, cls, x, y, hp: unitClass?.hp ?? 1 };
 }
 
 function initial(): GameState {
@@ -68,7 +69,11 @@ export const actions = {
     set({ paint, selectedUnitId: paint ? null : state.selectedUnitId });
   },
   hover(x: number | null, y?: number) {
-    set({ hoverTile: x === null ? null : { x, y: y! } });
+    if (x === null || y === undefined) {
+      set({ hoverTile: null });
+      return;
+    }
+    set({ hoverTile: { x, y } });
   },
   select(id: string | null) {
     set({ selectedUnitId: id, mode: id ? "move" : "select" });
@@ -84,8 +89,10 @@ export const actions = {
   },
   raiseTile(x: number, y: number, delta: number) {
     const tiles = state.tiles.slice();
-    const t = tiles[idx(state.width, x, y)]!;
-    tiles[idx(state.width, x, y)] = { ...t, height: Math.max(0, Math.min(8, t.height + delta)) };
+    const tileIndex = idx(state.width, x, y);
+    const t = tiles[tileIndex];
+    if (!t) return;
+    tiles[tileIndex] = { ...t, height: Math.max(0, Math.min(8, t.height + delta)) };
     set({ tiles });
   },
   tileClick(x: number, y: number) {
@@ -93,8 +100,10 @@ export const actions = {
 
     if (s.paint) {
       const tiles = s.tiles.slice();
-      const t = tiles[idx(s.width, x, y)]!;
-      tiles[idx(s.width, x, y)] = { ...t, type: s.paint };
+      const tileIndex = idx(s.width, x, y);
+      const t = tiles[tileIndex];
+      if (!t) return;
+      tiles[tileIndex] = { ...t, type: s.paint };
       set({ tiles });
       return;
     }

@@ -2,17 +2,18 @@ import { useMemo } from "react";
 import { Edges } from "@react-three/drei";
 import { actions, useGame } from "../../game/store";
 import { attackRange, movementRange, STEP } from "../../game/logic";
+import { TABLETOP_COLORS } from "../../game/palette";
 
 const COLORS: Record<string, string> = {
-  land: "#1d2a33",
-  water: "#0d2733",
-  void: "#101010",
+  land: TABLETOP_COLORS.charcoal,
+  water: TABLETOP_COLORS.navy,
+  void: TABLETOP_COLORS.black,
 };
 
 const WIRE: Record<string, string> = {
-  land: "#4f7f8f",
-  water: "#2f8fb5",
-  void: "#333333",
+  land: TABLETOP_COLORS.sage,
+  water: TABLETOP_COLORS.teal,
+  void: TABLETOP_COLORS.navy,
 };
 
 export function Board() {
@@ -60,18 +61,18 @@ export function Board() {
             >
               <boxGeometry args={[0.98, h, 0.98]} />
               <meshBasicMaterial
-                color={COLORS[t.type] ?? "#1d2a33"}
+                color={COLORS[t.type] ?? TABLETOP_COLORS.charcoal}
                 transparent
                 opacity={t.type === "water" ? 0.35 : 0.75}
               />
-              <Edges threshold={15} color={WIRE[t.type] ?? "#4f7f8f"} />
+              <Edges threshold={15} color={WIRE[t.type] ?? TABLETOP_COLORS.sage} />
             </mesh>
 
             {(inMove || inAttack || hovered) && (
               <mesh position={[0, top + 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeGeometry args={[0.94, 0.94]} />
                 <meshBasicMaterial
-                  color={inAttack ? "#ff4d5e" : inMove ? "#41d6ff" : "#f5e663"}
+                  color={inAttack ? TABLETOP_COLORS.coral : inMove ? TABLETOP_COLORS.teal : TABLETOP_COLORS.lavender}
                   transparent
                   opacity={hovered ? 0.5 : 0.28}
                   depthWrite={false}

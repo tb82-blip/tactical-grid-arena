@@ -4,15 +4,16 @@ import { XR, createXRStore } from "@react-three/xr";
 import { Scene } from "./Scene";
 import { HUD } from "./HUD";
 import { OneHandControls } from "./OneHandControls";
+import { TABLETOP_COLORS } from "../../game/palette";
 
 const xrStore = createXRStore();
 
 export function GameCanvas() {
   return (
     <div className="fixed inset-0 bg-background">
-      <Canvas camera={{ position: [10, 12, 14], fov: 50 }}>
-        <color attach="background" args={["#080d11"]} />
-        <fog attach="fog" args={["#080d11", 30, 70]} />
+      <Canvas flat dpr={[1, 1.5]} camera={{ position: [10, 12, 14], fov: 50 }}>
+        <color attach="background" args={[TABLETOP_COLORS.black]} />
+        <fog attach="fog" args={[TABLETOP_COLORS.black, 30, 70]} />
         <XR store={xrStore}>
           <OneHandControls />
           <Scene />
