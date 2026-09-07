@@ -81,7 +81,7 @@ function PanelButton({
   );
 }
 
-function Label({ text, active, width }: { text: string; active?: boolean; width: number }) {
+function Label({ text, active, width }: { text: string; active?: boolean | undefined; width: number }) {
   const texture = useRef<THREE.CanvasTexture | null>(null);
   if (!texture.current) {
     const c = document.createElement("canvas");
