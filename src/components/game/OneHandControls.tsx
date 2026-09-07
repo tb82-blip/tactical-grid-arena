@@ -4,6 +4,7 @@ import { useXR, XROrigin } from "@react-three/xr";
 import * as THREE from "three";
 import { actions, useGame } from "../../game/store";
 import type { TileType } from "../../game/types";
+import { TABLETOP_COLORS } from "../../game/palette";
 
 /**
  * Single-controller VR rig:
@@ -70,7 +71,7 @@ function PanelButton({
       >
         <boxGeometry args={[width, 0.05, 0.012]} />
         <meshBasicMaterial
-          color={active ? "#41d6ff" : hovered ? "#3a5563" : "#16242c"}
+          color={active ? TABLETOP_COLORS.teal : hovered ? TABLETOP_COLORS.navy : TABLETOP_COLORS.charcoal}
           transparent
           opacity={active ? 0.9 : 0.85}
         />
@@ -96,12 +97,13 @@ function Label({ text, active, width }: { text: string; active?: boolean | undef
   if (prevKey.current !== key) {
     prevKey.current = key;
     const ctx = tex.image as HTMLCanvasElement;
-    const g = ctx.getContext("2d")!;
+    const g = ctx.getContext("2d");
+    if (!g) return null;
     g.clearRect(0, 0, ctx.width, ctx.height);
     g.font = "bold 34px monospace";
     g.textAlign = "center";
     g.textBaseline = "middle";
-    g.fillStyle = active ? "#062a35" : "#41d6ff";
+    g.fillStyle = active ? TABLETOP_COLORS.black : TABLETOP_COLORS.lavender;
     g.fillText(text.toUpperCase(), ctx.width / 2, ctx.height / 2);
     tex.needsUpdate = true;
   }
@@ -134,7 +136,7 @@ function ControlPanel({ origin }: { origin: React.RefObject<THREE.Group | null> 
     <group ref={group}>
       <mesh position={[0, 0, -0.008]}>
         <planeGeometry args={[0.56, 0.34]} />
-        <meshBasicMaterial color="#080d11" transparent opacity={0.75} />
+        <meshBasicMaterial color={TABLETOP_COLORS.black} transparent opacity={0.88} />
       </mesh>
       <PanelButton label="move" active={s.mode === "move"} position={[-0.19, 0.12, 0]} onClick={() => actions.setMode("move")} />
       <PanelButton label="attack" active={s.mode === "attack"} position={[0, 0.12, 0]} onClick={() => actions.setMode("attack")} />
@@ -176,13 +178,14 @@ function ControlsCard() {
     const c = document.createElement("canvas");
     c.width = 512;
     c.height = 384;
-    const g = c.getContext("2d")!;
-    g.fillStyle = "#080d11";
+    const g = c.getContext("2d");
+    if (!g) return null;
+    g.fillStyle = TABLETOP_COLORS.black;
     g.fillRect(0, 0, c.width, c.height);
-    g.strokeStyle = "#41d6ff";
+    g.strokeStyle = TABLETOP_COLORS.lavender;
     g.lineWidth = 4;
     g.strokeRect(6, 6, c.width - 12, c.height - 12);
-    g.fillStyle = "#41d6ff";
+    g.fillStyle = TABLETOP_COLORS.teal;
     g.font = "bold 30px monospace";
     g.textAlign = "center";
     g.fillText("CONTROLS", c.width / 2, 46);
@@ -206,7 +209,8 @@ function ControlsCard() {
   useFrame(() => {
     if (!group.current || !grabbed.current) return;
     const ctrl = gl.xr.getController(0);
-    const parent = group.current.parent!;
+    const parent = group.current.parent;
+    if (!parent) return;
     // hold the card a bit in front of the controller while grabbed
     const pos = new THREE.Vector3(0, 0, -0.3).applyMatrix4(ctrl.matrixWorld);
     const q = ctrl.getWorldQuaternion(new THREE.Quaternion());
@@ -314,7 +318,7 @@ export function OneHandControls() {
 
   return (
     <>
-      <XROrigin ref={origin} position={[0, 0, 9]}>{session && <ControlsCard />}</XROrigin>
+       <XROrigin ref={origin} position={[0, 0, 9]}>{session && <ControlsCard />}</XROrigin>
       {session && panelOpen && <ControlPanel origin={origin} />}
     </>
   );

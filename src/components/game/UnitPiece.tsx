@@ -5,6 +5,7 @@ import { UNIT_CLASSES } from "../../game/classes";
 import { STEP, tileAt } from "../../game/logic";
 import { actions, useGame } from "../../game/store";
 import type { Unit } from "../../game/types";
+import { TABLETOP_COLORS } from "../../game/palette";
 
 function useObjModel(url?: string, textureUrl?: string) {
   const [obj, setObj] = useState<THREE.Group | null>(null);
@@ -47,12 +48,13 @@ function useObjModel(url?: string, textureUrl?: string) {
 
 export function UnitPiece({ unit, ox, oz }: { unit: Unit; ox: number; oz: number }) {
   const s = useGame();
-  const cls = UNIT_CLASSES[unit.cls]!;
+  const cls = UNIT_CLASSES[unit.cls];
+  if (!cls) return null;
   const model = s.models.find((m) => m.id === unit.modelId);
   const obj = useObjModel(model?.url, model?.textureUrl);
   const y = (tileAt(s, unit.x, unit.y)?.height ?? 0) * STEP;
   const selected = s.selectedUnitId === unit.id;
-  const color = unit.team === "blue" ? "#41d6ff" : "#ff4d5e";
+  const color = unit.team === "blue" ? TABLETOP_COLORS.lavender : TABLETOP_COLORS.coral;
 
   const cloned = useMemo(() => (obj ? obj.clone(true) : null), [obj]);
 
@@ -68,14 +70,14 @@ export function UnitPiece({ unit, ox, oz }: { unit: Unit; ox: number; oz: number
         <primitive object={cloned} />
       ) : (
         <mesh position={[0, 0.45, 0]}>
-          <boxGeometry args={[0.5, 0.9, 0.5]} />
+          <boxGeometry args={[0.62, 0.9, 0.62]} />
           <meshBasicMaterial color={color} wireframe />
         </mesh>
       )}
 
       {/* base ring */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.33, 0.44, 4]} />
+        <ringGeometry args={[0.34, 0.46, 4]} />
         <meshBasicMaterial color={color} transparent opacity={selected ? 1 : 0.45} />
       </mesh>
 
@@ -83,7 +85,7 @@ export function UnitPiece({ unit, ox, oz }: { unit: Unit; ox: number; oz: number
       <group position={[0, 1.15, 0]}>
         <mesh>
           <planeGeometry args={[0.6, 0.07]} />
-          <meshBasicMaterial color="#101820" />
+          <meshBasicMaterial color={TABLETOP_COLORS.charcoal} />
         </mesh>
         <mesh position={[(-0.6 * (1 - unit.hp / cls.hp)) / 2, 0, 0.001]}>
           <planeGeometry args={[0.6 * (unit.hp / cls.hp), 0.07]} />

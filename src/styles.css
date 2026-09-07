@@ -59,29 +59,35 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-move: var(--move);
+  --color-team-one: var(--team-one);
+  --color-terrain: var(--terrain);
 }
 
 :root {
   --radius: 0rem;
-  --background: oklch(0.16 0.02 235);
-  --foreground: oklch(0.92 0.02 210);
-  --card: oklch(0.2 0.025 235);
-  --card-foreground: oklch(0.92 0.02 210);
-  --popover: oklch(0.2 0.025 235);
-  --popover-foreground: oklch(0.92 0.02 210);
-  --primary: oklch(0.82 0.14 205);
-  --primary-foreground: oklch(0.16 0.02 235);
-  --secondary: oklch(0.26 0.03 235);
-  --secondary-foreground: oklch(0.92 0.02 210);
-  --muted: oklch(0.26 0.03 235);
-  --muted-foreground: oklch(0.68 0.03 215);
-  --accent: oklch(0.3 0.05 210);
-  --accent-foreground: oklch(0.92 0.02 210);
-  --destructive: oklch(0.63 0.21 20);
-  --destructive-foreground: oklch(0.96 0.01 240);
-  --border: oklch(0.36 0.04 220);
-  --input: oklch(0.36 0.04 220);
-  --ring: oklch(0.82 0.14 205);
+  --background: oklch(0.15 0.01 100);
+  --foreground: oklch(0.79 0.018 110);
+  --card: oklch(0.19 0.012 105);
+  --card-foreground: oklch(0.79 0.018 110);
+  --popover: oklch(0.19 0.012 105);
+  --popover-foreground: oklch(0.79 0.018 110);
+  --primary: oklch(0.79 0.10 183);
+  --primary-foreground: oklch(0.15 0.01 100);
+  --secondary: oklch(0.43 0.09 265);
+  --secondary-foreground: oklch(0.89 0.04 300);
+  --muted: oklch(0.24 0.016 105);
+  --muted-foreground: oklch(0.71 0.018 110);
+  --accent: oklch(0.77 0.07 300);
+  --accent-foreground: oklch(0.15 0.01 100);
+  --destructive: oklch(0.72 0.18 35);
+  --destructive-foreground: oklch(0.15 0.01 100);
+  --border: oklch(0.43 0.09 265);
+  --input: oklch(0.43 0.09 265);
+  --ring: oklch(0.79 0.10 183);
+  --move: oklch(0.79 0.10 183);
+  --team-one: oklch(0.77 0.07 300);
+  --terrain: oklch(0.75 0.018 110);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +146,6 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    letter-spacing: 0;
   }
 }
