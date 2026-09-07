@@ -165,6 +165,76 @@ function ControlPanel({ origin }: { origin: React.RefObject<THREE.Group | null> 
   );
 }
 
+/** Floating controls cheat-sheet you can grab out of the air with the trigger. */
+function ControlsCard() {
+  const { gl } = useThree();
+  const group = useRef<THREE.Group>(null);
+  const grabbed = useRef(false);
+
+  const texture = useRef<THREE.CanvasTexture | null>(null);
+  if (!texture.current) {
+    const c = document.createElement("canvas");
+    c.width = 512;
+    c.height = 384;
+    const g = c.getContext("2d")!;
+    g.fillStyle = "#080d11";
+    g.fillRect(0, 0, c.width, c.height);
+    g.strokeStyle = "#41d6ff";
+    g.lineWidth = 4;
+    g.strokeRect(6, 6, c.width - 12, c.height - 12);
+    g.fillStyle = "#41d6ff";
+    g.font = "bold 30px monospace";
+    g.textAlign = "center";
+    g.fillText("CONTROLS", c.width / 2, 46);
+    g.textAlign = "left";
+    g.font = "22px monospace";
+    const lines = [
+      "TRIGGER   select / click tile",
+      "STICK F/B dolly in / out",
+      "STICK L/R snap turn 45°",
+      "GRIP      drag the world",
+      "A / X     toggle button panel",
+      "",
+      "grab this card with the",
+      "trigger to move it around",
+    ];
+    lines.forEach((l, i) => g.fillText(l, 32, 100 + i * 34));
+    texture.current = new THREE.CanvasTexture(c);
+    texture.current.magFilter = THREE.NearestFilter;
+  }
+
+  useFrame(() => {
+    if (!group.current || !grabbed.current) return;
+    const ctrl = gl.xr.getController(0);
+    const parent = group.current.parent!;
+    // hold the card a bit in front of the controller while grabbed
+    const pos = new THREE.Vector3(0, 0, -0.3).applyMatrix4(ctrl.matrixWorld);
+    const q = ctrl.getWorldQuaternion(new THREE.Quaternion());
+    group.current.position.copy(parent.worldToLocal(pos));
+    group.current.quaternion.copy(parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));
+  });
+
+  return (
+    <group ref={group} position={[0.35, 1.5, 8.2]} rotation-y={-0.3}>
+      <mesh
+        onPointerDown={(e: ThreeEvent<MouseEvent>) => {
+          e.stopPropagation();
+          grabbed.current = true;
+        }}
+        onPointerUp={() => {
+          grabbed.current = false;
+        }}
+        onPointerMissed={() => {
+          grabbed.current = false;
+        }}
+      >
+        <planeGeometry args={[0.36, 0.27]} />
+        <meshBasicMaterial map={texture.current} transparent opacity={0.95} />
+      </mesh>
+    </group>
+  );
+}
+
 export function OneHandControls() {
   const origin = useRef<THREE.Group>(null);
   const source = usePrimaryInputSource();
@@ -244,7 +314,7 @@ export function OneHandControls() {
 
   return (
     <>
-      <XROrigin ref={origin} position={[0, 0, 9]} />
+      <XROrigin ref={origin} position={[0, 0, 9]}>{session && <ControlsCard />}</XROrigin>
       {session && panelOpen && <ControlPanel origin={origin} />}
     </>
   );
