@@ -116,15 +116,20 @@ export function HUD({ onEnterVR }: { onEnterVR: () => void }) {
         <div className="pointer-events-auto border border-border bg-background/90 p-2 backdrop-blur">
           {selected && cls ? (
             <div className="space-y-0.5">
-              <div className="text-accent">
+              <div className="flex items-center gap-1.5 text-accent">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: cls.glowColor, boxShadow: `0 0 6px ${cls.glowColor}` }}
+                />
                 {selected.name} — {cls.label} [{selected.team}]
               </div>
+              <div className="text-muted-foreground">{cls.blurb}</div>
               <div className="text-muted-foreground">
                 HP {selected.hp}/{cls.hp} · MOVE {cls.move}m · JUMP {cls.jump * 0.25}m · RANGE {cls.attackMin}-
                 {cls.attackMax}m {cls.aquatic ? "· aquatic" : ""}
               </div>
               <div className="text-muted-foreground">
-                teal = movement · coral = attack · lavender = team one
+                teal = movement · coral = attack · glow dot = class
               </div>
             </div>
           ) : (

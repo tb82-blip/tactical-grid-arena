@@ -1,5 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import { Edges } from "@react-three/drei";
+import type * as THREE from "three";
 import { actions, useGame } from "../../game/store";
 import { attackRange, movementRange, STEP } from "../../game/logic";
 import { TABLETOP_COLORS } from "../../game/palette";
@@ -15,6 +17,29 @@ const WIRE: Record<string, string> = {
   water: TABLETOP_COLORS.teal,
   void: TABLETOP_COLORS.navy,
 };
+
+function HighlightTile({
+  top,
+  color,
+  hovered,
+}: {
+  top: number;
+  color: string;
+  hovered: boolean;
+}) {
+  const mat = useRef<THREE.MeshBasicMaterial>(null);
+  useFrame(({ clock }) => {
+    if (!mat.current) return;
+    const pulse = 0.22 + Math.sin(clock.elapsedTime * 3.2) * 0.08;
+    mat.current.opacity = hovered ? 0.6 : pulse;
+  });
+  return (
+    <mesh position={[0, top + 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[0.94, 0.94]} />
+      <meshBasicMaterial ref={mat} color={color} transparent depthWrite={false} toneMapped={false} />
+    </mesh>
+  );
+}
 
 export function Board() {
   const s = useGame();
@@ -44,6 +69,11 @@ export function Board() {
         const inMove = moveSet.has(key);
         const inAttack = attackSet.has(key);
         const hovered = s.hoverTile?.x === x && s.hoverTile?.y === y;
+        const highlightColor = inAttack
+          ? TABLETOP_COLORS.coral
+          : inMove
+            ? TABLETOP_COLORS.teal
+            : TABLETOP_COLORS.lavender;
 
         return (
           <group key={key} position={[ox + x, 0, oz + y]}>
@@ -60,25 +90,19 @@ export function Board() {
               }}
             >
               <boxGeometry args={[0.98, h, 0.98]} />
-              <meshBasicMaterial
+              <meshStandardMaterial
                 color={COLORS[t.type] ?? TABLETOP_COLORS.charcoal}
                 transparent
-                opacity={t.type === "water" ? 0.35 : 0.75}
+                opacity={t.type === "water" ? 0.4 : 0.82}
+                roughness={0.65}
+                metalness={0.15}
+                emissive={WIRE[t.type] ?? TABLETOP_COLORS.sage}
+                emissiveIntensity={t.type === "water" ? 0.15 : 0.06}
               />
               <Edges threshold={15} color={WIRE[t.type] ?? TABLETOP_COLORS.sage} />
             </mesh>
 
-            {(inMove || inAttack || hovered) && (
-              <mesh position={[0, top + 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <planeGeometry args={[0.94, 0.94]} />
-                <meshBasicMaterial
-                  color={inAttack ? TABLETOP_COLORS.coral : inMove ? TABLETOP_COLORS.teal : TABLETOP_COLORS.lavender}
-                  transparent
-                  opacity={hovered ? 0.5 : 0.28}
-                  depthWrite={false}
-                />
-              </mesh>
-            )}
+            {(inMove || inAttack || hovered) && <HighlightTile top={top} color={highlightColor} hovered={hovered} />}
           </group>
         );
       })}
